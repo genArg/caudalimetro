@@ -132,8 +132,8 @@ class Grafica(Frame):
          print(self.datos)
          dato = self.datos.split(" ")
          
-         self.valor_actual.config(text=self.sensor) #muestra el valor en la etiqueta
-         self.valor_actual_1.config(text=self.valor_adc) #muestra el valor en la etiqueta
+         ##self.valor_actual.config(text=self.sensor) #muestra el valor en la etiqueta
+         ##self.valor_actual_1.config(text=self.valor_adc) #muestra el valor en la etiqueta
 
          try:
             self.sensor = dato[0]
@@ -185,7 +185,7 @@ class Grafica(Frame):
 
       ## define etiquetas de referencia
       Label(frame, text='Tomar valores', bg='#090808', fg='white', font=('Arial', 12, 'bold')).pack(padx=5, expand=1)
-      Label(frame0, text='Valor Actual', bg='#090808', fg='white', font=('Arial', 12, 'bold')).pack(padx=5, expand=1)
+      #Label(frame0, text='Valor Actual', bg='#090808', fg='white', font=('Arial', 12, 'bold')).pack(padx=5, expand=1)
       Label(frame1, text='Guardar Documento', bg='#090808', fg='white', font=('Arial', 12, 'bold')).pack(padx=5, expand=1)
       Label(frame2, text='Nombre del Documento', bg='#090808', fg='white', font=('Arial', 12, 'bold')).pack(padx=5, expand=1)
       Label(frame3, text='CONECTAR', bg='#090808', fg='white', font=('Arial', 12, 'bold')).pack(padx=5, expand=1)
@@ -198,17 +198,51 @@ class Grafica(Frame):
       nombre_doc.pack(padx=5, expand=1)
 
       ## define una variable para mostrar el dato por pantalla
+      """
       self.valor_actual=Label(frame0, font=('Arial', 12, 'bold'))
       self.valor_actual.pack(padx=5, expand=1)
       self.valor_actual_1=Label(frame0, font=('Arial', 12, 'bold'))
       self.valor_actual_1.pack(padx=5, expand=1)
+      """
 
-      self.tiempo_2=Label(frame0, font=('Arial', 12, 'bold'))
-      self.tiempo_2.pack(padx=5, expand=1)
-      self.delta_2=Label(frame0, font=('Arial', 12, 'bold'))
-      self.delta_2.pack(padx=5, expand=1)
-      self.adc_2=Label(frame0, font=('Arial', 12, 'bold'))
-      self.adc_2.pack(padx=5, expand=1)
+      self.tiempo_1 = Label(frame0, font=('Arial', 12, 'bold'))
+      self.tiempo_1.grid(row=1, column=0)
+      self.delta_1 = Label(frame0, font=('Arial', 12, 'bold'))
+      self.delta_1.grid(row=2, column=0)
+      self.adc_1 = Label(frame0, font=('Arial', 12, 'bold'))
+      self.adc_1.grid(row=3, column=0)
+
+      self.tiempo_2 = Label(frame0, font=('Arial', 12, 'bold'))
+      self.tiempo_2.grid(row=1, column=1)
+      self.delta_2 = Label(frame0, font=('Arial', 12, 'bold'))
+      self.delta_2.grid(row=2, column=1)
+      self.adc_2 = Label(frame0, font=('Arial', 12, 'bold'))
+      self.adc_2.grid(row=3, column=1)
+
+      self.tiempo_3 = Label(frame0, font=('Arial', 12, 'bold'))
+      self.tiempo_3.grid(row=1, column=2)
+      self.delta_3 = Label(frame0, font=('Arial', 12, 'bold'))
+      self.delta_3.grid(row=2, column=2)
+      self.adc_3 = Label(frame0, font=('Arial', 12, 'bold'))
+      self.adc_3.grid(row=3, column=2)
+
+      self.tiempo_4 = Label(frame0, font=('Arial', 12, 'bold'))
+      self.tiempo_4.grid(row=1, column=3)
+      self.delta_4 = Label(frame0, font=('Arial', 12, 'bold'))
+      self.delta_4.grid(row=2, column=3)
+      self.adc_4 = Label(frame0, font=('Arial', 12, 'bold'))
+      self.adc_4.grid(row=3, column=3)
+
+      self.frame0.columnconfigure(0, weight=1)
+
+      #self.tiempo_2.pack(padx=5, expand=1)
+      #self.tiempo_2.grid(column=0, row=1, padx=5, expand=1)
+      #self.delta_2=Label(frame0, font=('Arial', 12, 'bold'))
+      #self.delta_2.pack(padx=5, expand=1)
+      #self.delta_2.grid(column=0, row=1, padx=5, expand=1)
+      #self.adc_2=Label(frame0, font=('Arial', 12, 'bold'))
+      #self.adc_2.pack(padx=5, expand=1)
+      #self.delta_2.grid(column=0, row=1, padx=5, expand=1)
 
       ## define  botones
       self.bt_iniciar = Button(frame, text='Iniciar', font=('Arial', 12, 'bold'),
