@@ -30,10 +30,10 @@ class Grafica(Frame):
       self.aux_2 = 0 # Variable axiliar para guardar columnas  momentaneos
       self.columna = 0 #define el espaicio para almacenar la columna
 
-      self.tiempo_anterior_1 = "" # variable para almacenar el tiempo anterior
-      self.tiempo_anterior_2 = ""
-      self.tiempo_anterior_3 = ""
-      self.tiempo_anterior_4 = ""
+      self.tiempo_anterior_1 = datetime.now() # variable para almacenar el tiempo anterior
+      self.tiempo_anterior_2 = datetime.now()
+      self.tiempo_anterior_3 = datetime.now()
+      self.tiempo_anterior_4 = datetime.now()
 
       self.tiempo_1 = datetime.now() #variable para guardar el tiempo actual
       self.tiempo_2 = datetime.now() #variable para guardar el tiempo actual
@@ -54,6 +54,9 @@ class Grafica(Frame):
       self.hora_aux = "" #variable para almacenar la hora formateada
       self.delta_aux = "" #variable para almacenar la variacion de teimpo
 
+      self.tiempo_actual_fomateado = ["none", "none", "none", "none"] # para guardar los tiempos formateados
+      self.tiempo_anterior_fomateado = ["none", "none", "none", "none"]
+
       self.datos_placa.recibida.clear() #Se limpia el evento del hilo principal por primera vez
       self.widgets()
 
@@ -70,6 +73,8 @@ class Grafica(Frame):
          self.delta_aux = self.delta_1 # almacena momentaneamente el valor de delta para guardarlo
          self.hora_aux = self.tiempo_1.strftime("%H:%M:%S") # formatea el valor para almacenar hoja de calculo
          self.valor_adc_1 = self.valor_adc # para mostra el valor por pantalla
+         self.tiempo_anterior_fomateado[0] = self.tiempo_actual_fomateado[0]
+         self.tiempo_actual_fomateado[0] = self.hora_aux
       elif self.sensor == "2":
          self.fila_sensor_2 += 1
          self.aux_1 = self.fila_sensor_2
@@ -80,6 +85,8 @@ class Grafica(Frame):
          self.delta_aux = self.delta_2 # almacena momentaneamente el valor de delta para guardarlo
          self.hora_aux = self.tiempo_2.strftime("%H:%M:%S") # formatea el valor para almacenar hoja de calculo
          self.valor_adc_2 = self.valor_adc # para mostra el valor por pantalla
+         self.tiempo_anterior_fomateado[1] = self.tiempo_actual_fomateado[1]
+         self.tiempo_actual_fomateado[1] = self.hora_aux
       elif self.sensor == "3":
          self.fila_sensor_3 += 1
          self.aux_1 = self.fila_sensor_3
@@ -90,6 +97,8 @@ class Grafica(Frame):
          self.delta_aux = self.delta_3 # almacena momentaneamente el valor de delta para guardarlo
          self.hora_aux = self.tiempo_3.strftime("%H:%M:%S") # formatea el valor para almacenar hoja de calculo
          self.valor_adc_3 = self.valor_adc # para mostra el valor por pantalla
+         self.tiempo_anterior_fomateado[2] = self.tiempo_actual_fomateado[2]
+         self.tiempo_actual_fomateado[2] = self.hora_aux
       elif self.sensor == "4":
          self.fila_sensor_4 += 1
          self.aux_1 = self.fila_sensor_4
@@ -100,6 +109,8 @@ class Grafica(Frame):
          self.delta_aux = self.delta_4 # almacena momentaneamente el valor de delta para guardarlo
          self.hora_aux = self.tiempo_4.strftime("%H:%M:%S") # formatea el valor para almacenar hoja de calculo
          self.valor_adc_4 = self.valor_adc # para mostra el valor por pantalla
+         self.tiempo_anterior_fomateado[3] = self.tiempo_actual_fomateado[3]
+         self.tiempo_actual_fomateado[3] = self.hora_aux
 
       # guarda la hora
       self.sheet.cell(row=self.aux_1, column=self.aux_2, value=self.hora_aux)
@@ -115,26 +126,26 @@ class Grafica(Frame):
 
       # sensor 1
       self.valor_actual_1_t.config(text=self.valor_adc_1)
-      self.tiempo_1_t.config(text=self.tiempo_1)
-      self.tiempo_anterior_1_t.config(text=self.tiempo_anterior_1)
+      self.tiempo_1_t.config(text=self.tiempo_actual_fomateado[0])
+      self.tiempo_anterior_1_t.config(text=self.tiempo_anterior_fomateado[0])
       self.delta_1_t.config(text=self.delta_1)
 
       # sensor 2
       self.valor_actual_2_t.config(text=self.valor_adc_2)
-      self.tiempo_2_t.config(text=self.tiempo_2)
-      self.tiempo_anterior_2_t.config(text=self.tiempo_anterior_2)
+      self.tiempo_2_t.config(text=self.tiempo_actual_fomateado[1])
+      self.tiempo_anterior_2_t.config(text=self.tiempo_anterior_fomateado[1])
       self.delta_2_t.config(text=self.delta_2)
 
       # sensor 3
       self.valor_actual_3_t.config(text=self.valor_adc_3)
-      self.tiempo_3_t.config(text=self.tiempo_3)
-      self.tiempo_anterior_3_t.config(text=self.tiempo_anterior_3)
+      self.tiempo_3_t.config(text=self.tiempo_actual_fomateado[2])
+      self.tiempo_anterior_3_t.config(text=self.tiempo_anterior_fomateado[2])
       self.delta_3_t.config(text=self.delta_3)
 
       # sensor 2
       self.valor_actual_4_t.config(text=self.valor_adc_4)
-      self.tiempo_4_t.config(text=self.tiempo_4)
-      self.tiempo_anterior_4_t.config(text=self.tiempo_anterior_4)
+      self.tiempo_4_t.config(text=self.tiempo_actual_fomateado[3])
+      self.tiempo_anterior_4_t.config(text=self.tiempo_anterior_fomateado[3])
       self.delta_4_t.config(text=self.delta_4)
 
    def HiloPrincipal(self):
