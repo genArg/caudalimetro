@@ -10,7 +10,7 @@ class Grafica(Frame):
       super().__init__(master, *args)
 
       self.datos_placa = Comunicacion()
-      self.datos_placa.puertos_disponibles()
+      self.datos_placa.puertos_disponibles()
 
       self.nombre_documento = StringVar()
       self.datos = 0.0
@@ -30,6 +30,11 @@ class Grafica(Frame):
       self.aux_2 = 0 # Variable axiliar para guardar columnas  momentaneos
       self.columna = 0 #define el espaicio para almacenar la columna
 
+      self.tiempo_anterior_1 = "" # variable para almacenar el tiempo anterior
+      self.tiempo_anterior_2 = ""
+      self.tiempo_anterior_3 = ""
+      self.tiempo_anterior_4 = ""
+
       self.tiempo_1 = datetime.now() #variable para guardar el tiempo actual
       self.tiempo_2 = datetime.now() #variable para guardar el tiempo actual
       self.tiempo_3 = datetime.now() #variable para guardar el tiempo actual
@@ -39,6 +44,11 @@ class Grafica(Frame):
       self.delta_2 = 0 # variable para guardar la variacion temporal entre muestras
       self.delta_3 = 0 # variable para guardar la variacion temporal entre muestras
       self.delta_4 = 0 # variable para guardar la variacion temporal entre muestras
+
+      self.valor_adc_1 = 0 # Almacena el ultimo valor adc
+      self.valor_adc_2 = 0
+      self.valor_adc_3 = 0
+      self.valor_adc_4 = 0
 
       self.fecha = datetime.now() # variable para guardar la fecha
       self.hora_aux = "" #variable para almacenar la hora formateada
@@ -54,34 +64,42 @@ class Grafica(Frame):
          self.fila_sensor_1 += 1
          self.aux_1 = self.fila_sensor_1
          self.aux_2 = 1 # donde inicia la columna de cada sensor
-         self.delta_1 = datetime.now() - self.tiempo_1 # calcula la variacion temporal
+         self.tiempo_anterior_1 = self.tiempo_1 # Gurada el tiempo anterior
          self.tiempo_1 = datetime.now() # obtien la hora actual
+         self.delta_1 = self.tiempo_1 - self.tiempo_anterior_1 # calcula la variacion temporal
          self.delta_aux = self.delta_1 # almacena momentaneamente el valor de delta para guardarlo
          self.hora_aux = self.tiempo_1.strftime("%H:%M:%S") # formatea el valor para almacenar hoja de calculo
+         self.valor_adc_1 = self.valor_adc # para mostra el valor por pantalla
       elif self.sensor == "2":
          self.fila_sensor_2 += 1
          self.aux_1 = self.fila_sensor_2
          self.aux_2 = 4
-         self.delta_2 = datetime.now() - self.tiempo_2 # calcula la variacion temporal
+         self.tiempo_anterior_2 = self.tiempo_2 # Gurada el tiempo anterior
          self.tiempo_2 = datetime.now() # obtien la hora actual
+         self.delta_2 = self.tiempo_2 - self.tiempo_anterior_2 # calcula la variacion temporal
          self.delta_aux = self.delta_2 # almacena momentaneamente el valor de delta para guardarlo
          self.hora_aux = self.tiempo_2.strftime("%H:%M:%S") # formatea el valor para almacenar hoja de calculo
+         self.valor_adc_2 = self.valor_adc # para mostra el valor por pantalla
       elif self.sensor == "3":
          self.fila_sensor_3 += 1
          self.aux_1 = self.fila_sensor_3
          self.aux_2 = 7
-         self.delta_3 = datetime.now() - self.tiempo_3 # calcula la variacion temporal
+         self.tiempo_anterior_3 = self.tiempo_3 # Gurada el tiempo anterior
          self.tiempo_3 = datetime.now() # obtien la hora actual
+         self.delta_3 = self.tiempo_3 - self.tiempo_anterior_3 # calcula la variacion temporal
          self.delta_aux = self.delta_3 # almacena momentaneamente el valor de delta para guardarlo
          self.hora_aux = self.tiempo_3.strftime("%H:%M:%S") # formatea el valor para almacenar hoja de calculo
+         self.valor_adc_3 = self.valor_adc # para mostra el valor por pantalla
       elif self.sensor == "4":
          self.fila_sensor_4 += 1
          self.aux_1 = self.fila_sensor_4
          self.aux_2 = 10
-         self.delta_4 = datetime.now() - self.tiempo_4 # calcula la variacion temporal
+         self.tiempo_anterior_4 = self.tiempo_4 # Gurada el tiempo anterior
          self.tiempo_4 = datetime.now() # obtien la hora actual
+         self.delta_4 = self.tiempo_4 - self.tiempo_anterior_4 # calcula la variacion temporal
          self.delta_aux = self.delta_4 # almacena momentaneamente el valor de delta para guardarlo
          self.hora_aux = self.tiempo_4.strftime("%H:%M:%S") # formatea el valor para almacenar hoja de calculo
+         self.valor_adc_4 = self.valor_adc # para mostra el valor por pantalla
 
       # guarda la hora
       self.sheet.cell(row=self.aux_1, column=self.aux_2, value=self.hora_aux)
@@ -91,8 +109,33 @@ class Grafica(Frame):
       # guarda el caudal
       self.aux_2 += 1
       self.sheet.cell(row=self.aux_1, column=self.aux_2, value=self.valor_adc)
-      
 
+   ## Actualiza el valor de las etiquetas de la pantalla  
+   def ColocarValores(self):
+
+      # sensor 1
+      self.valor_actual_1_t.config(text=self.valor_adc_1)
+      self.tiempo_1_t.config(text=self.tiempo_1)
+      self.tiempo_anterior_1_t.config(text=self.tiempo_anterior_1)
+      self.delta_1_t.config(text=self.delta_1)
+
+      # sensor 2
+      self.valor_actual_2_t.config(text=self.valor_adc_2)
+      self.tiempo_2_t.config(text=self.tiempo_2)
+      self.tiempo_anterior_2_t.config(text=self.tiempo_anterior_2)
+      self.delta_2_t.config(text=self.delta_2)
+
+      # sensor 3
+      self.valor_actual_3_t.config(text=self.valor_adc_3)
+      self.tiempo_3_t.config(text=self.tiempo_3)
+      self.tiempo_anterior_3_t.config(text=self.tiempo_anterior_3)
+      self.delta_3_t.config(text=self.delta_3)
+
+      # sensor 2
+      self.valor_actual_4_t.config(text=self.valor_adc_4)
+      self.tiempo_4_t.config(text=self.tiempo_4)
+      self.tiempo_anterior_4_t.config(text=self.tiempo_anterior_4)
+      self.delta_4_t.config(text=self.delta_4)
 
    def HiloPrincipal(self):
 
@@ -140,12 +183,9 @@ class Grafica(Frame):
          except:
             pass
 
-         self.valor_actual_1.config(text=self.sensor) #muestra el valor en la etiqueta
-         self.tiempo_1.config(text=self.valor_adc) #muestra el valor en la etiqueta
-         self.delta_1.config(text=self.valor_adc) #muestra el valor en la etiqueta
-
          if self.sensor:
             self.fn_logica()
+            self.ColocarValores()
          
 
    def CrearHilo(self):
@@ -199,41 +239,50 @@ class Grafica(Frame):
 
       ## define una variable para mostrar el dato por pantalla del Frame 0
       Label(frame0, text='Valor Actual', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=1, column=0, padx=5, pady=5, sticky='nsew')
-      Label(frame0, text='Hora', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=2, column=0, padx=5, pady=5, sticky='nsew')
-      Label(frame0, text='Tiempo diferencial', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=3, column=0, padx=5, pady=5, sticky='nsew')
+      Label(frame0, text='Hora Actual', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=2, column=0, padx=5, pady=5, sticky='nsew')
+      Label(frame0, text='Hora Anterior', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=3, column=0, padx=5, pady=5, sticky='nsew')
+      Label(frame0, text='Tiempo diferencial', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=4, column=0, padx=5, pady=5, sticky='nsew')
 
 
       Label(frame0, text='Sensor 1', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=0, column=1, padx=5, pady=5, sticky='nsew')
-      self.valor_actual_1 = Label(frame0, text="none", font=('Arial', 12, 'bold'))
-      self.valor_actual_1.grid(row=1, column=1, padx=5, pady=5)
-      self.tiempo_1 = Label(frame0, text="none", font=('Arial', 12, 'bold'))
-      self.tiempo_1.grid(row=2, column=1, padx=5, pady=5)
-      self.delta_1 = Label(frame0, text="none", font=('Arial', 12, 'bold'))
-      self.delta_1.grid(row=3, column=1, padx=5, pady=5)
+      self.valor_actual_1_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.valor_actual_1_t.grid(row=1, column=1, padx=5, pady=5)
+      self.tiempo_1_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.tiempo_1_t.grid(row=2, column=1, padx=5, pady=5)
+      self.tiempo_anterior_1_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.tiempo_anterior_1_t.grid(row=3, column=1, padx=5, pady=5)
+      self.delta_1_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.delta_1_t.grid(row=4, column=1, padx=5, pady=5)
 
       Label(frame0, text='Sensor 2', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=0, column=2, padx=5, pady=5, sticky='nsew')
-      self.valor_actual_2 = Label(frame0, text="none", font=('Arial', 12, 'bold'))
-      self.valor_actual_2.grid(row=1, column=2, padx=5, pady=5)
-      self.tiempo_2 = Label(frame0, text="none", font=('Arial', 12, 'bold'))
-      self.tiempo_2.grid(row=2, column=2, padx=5, pady=5)
-      self.delta_2 = Label(frame0, text="none", font=('Arial', 12, 'bold'))
-      self.delta_2.grid(row=3, column=2, padx=5, pady=5)
+      self.valor_actual_2_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.valor_actual_2_t.grid(row=1, column=2, padx=5, pady=5)
+      self.tiempo_2_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.tiempo_2_t.grid(row=2, column=2, padx=5, pady=5)
+      self.tiempo_anterior_2_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.tiempo_anterior_2_t.grid(row=3, column=2, padx=5, pady=5)
+      self.delta_2_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.delta_2_t.grid(row=4, column=2, padx=5, pady=5)
 
       Label(frame0, text='Sensor 3', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=0, column=3, padx=5, pady=5, sticky='nsew')
-      self.valor_actual_3 = Label(frame0, text="none", font=('Arial', 12, 'bold'))
-      self.valor_actual_3.grid(row=1, column=3, padx=5, pady=5)
-      self.tiempo_3 = Label(frame0, text="none", font=('Arial', 12, 'bold'))
-      self.tiempo_3.grid(row=2, column=3, padx=5, pady=5)
-      self.delta_3 = Label(frame0, text="none", font=('Arial', 12, 'bold'))
-      self.delta_3.grid(row=3, column=3, padx=5, pady=5)
+      self.valor_actual_3_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.valor_actual_3_t.grid(row=1, column=3, padx=5, pady=5)
+      self.tiempo_3_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.tiempo_3_t.grid(row=2, column=3, padx=5, pady=5)
+      self.tiempo_anterior_3_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.tiempo_anterior_3_t.grid(row=3, column=3, padx=5, pady=5)
+      self.delta_3_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.delta_3_t.grid(row=4, column=3, padx=5, pady=5)
 
       Label(frame0, text='Sensor 4', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=0, column=4, padx=5, pady=5, sticky='nsew')
-      self.valor_actual_4 = Label(frame0, text="none", font=('Arial', 12, 'bold'))
-      self.valor_actual_4.grid(row=1, column=4, padx=5, pady=5)
-      self.tiempo_4 = Label(frame0, text="none", font=('Arial', 12, 'bold'))
-      self.tiempo_4.grid(row=2, column=4, padx=5, pady=5)
-      self.delta_4 = Label(frame0, text="none", font=('Arial', 12, 'bold'))
-      self.delta_4.grid(row=3, column=4, padx=5, pady=5)
+      self.valor_actual_4_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.valor_actual_4_t.grid(row=1, column=4, padx=5, pady=5)
+      self.tiempo_4_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.tiempo_4_t.grid(row=2, column=4, padx=5, pady=5)
+      self.tiempo_anterior_4_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.tiempo_anterior_4_t.grid(row=3, column=4, padx=5, pady=5)
+      self.delta_4_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.delta_4_t.grid(row=4, column=4, padx=5, pady=5)
 
       ## configuracion relativa del los tamaños dentro del frame 0
       frame0.columnconfigure(0,weight=1)
@@ -245,6 +294,7 @@ class Grafica(Frame):
       frame0.rowconfigure(1, weight=1)
       frame0.rowconfigure(2, weight=1)
       frame0.rowconfigure(3, weight=1)
+      frame0.rowconfigure(4, weight=1)
    
 
 
