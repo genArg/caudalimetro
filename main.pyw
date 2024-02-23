@@ -61,10 +61,14 @@ class Grafica(Frame):
       self.tiempo_anterior_fomateado = ["none", "none", "none", "none"]
       self.caudal = [0, 0 , 0, 0] # guarda los caudales
       self.factor = [0, 0] # guarda los factores
+      self.flag = [0, 0] # flagas para distinatos propositos 
+
+      self.terminal = "Conectado" # variables para crear una Terminal
+
+      self.imagen = PhotoImage(file="img1.png")
 
       self.datos_placa.recibida.clear() #Se limpia el evento del hilo principal por primera vez
       self.widgets()
-
 
    def fn_logica(self):
 
@@ -102,7 +106,9 @@ class Grafica(Frame):
          self.caudal[1] = round(self.factor[0] / self.delta_2, 4) #calcula el caudal con la variacion temporal y el factor
          caudal_aux = self.caudal[1]
       elif self.sensor == "3":
-         self.fila_sensor_3 += 1
+         if self.flag[0] == 1:
+            self.fila_sensor_3 += 1
+            self.flag[1] = 1 #habilita el guardado 
          self.aux_1 = self.fila_sensor_3
          self.aux_2 = 1 + 2*self.n
          self.tiempo_anterior_3 = self.tiempo_3 # Gurada el tiempo anterior
@@ -117,7 +123,7 @@ class Grafica(Frame):
          self.caudal[2] = round(self.factor[1] / self.delta_3, 4) #calcula el caudal con la variacion temporal y el factor
          caudal_aux = self.caudal[2]
       elif self.sensor == "4":
-         self.fila_sensor_4 += 1
+         self.fila_sensor_4 += 1 
          self.aux_1 = self.fila_sensor_4
          self.aux_2 = 1 + 3 * self.n
          self.tiempo_anterior_4 = self.tiempo_4 # Gurada el tiempo anterior
@@ -132,17 +138,19 @@ class Grafica(Frame):
          self.caudal[3] = round(self.factor[1] / self.delta_4, 4) #calcula el caudal con la variacion temporal y el factor
          caudal_aux = self.caudal[3]
 
-      # guarda la hora
-      self.sheet.cell(row=self.aux_1, column=self.aux_2, value=self.hora_aux)
-      # guarda la variacion temporal
-      self.aux_2 += 1
-      self.sheet.cell(row=self.aux_1, column=self.aux_2, value=self.delta_aux)
-      # guarda el el valor adc
-      self.aux_2 += 1
-      self.sheet.cell(row=self.aux_1, column=self.aux_2, value=self.valor_adc)
-      # guarda el caudal
-      self.aux_2 += 1
-      self.sheet.cell(row=self.aux_1, column=self.aux_2, value=caudal_aux)
+      if self.flag[1] == 1 :
+         self.flag[1] = 0 #desabilita el guardado 
+         # guarda la hora
+         self.sheet.cell(row=self.aux_1, column=self.aux_2, value=self.hora_aux)
+         # guarda la variacion temporal
+         self.aux_2 += 1
+         self.sheet.cell(row=self.aux_1, column=self.aux_2, value=self.delta_aux)
+         # guarda el el valor adc
+         self.aux_2 += 1
+         self.sheet.cell(row=self.aux_1, column=self.aux_2, value=self.valor_adc)
+         # guarda el caudal
+         self.aux_2 += 1
+         self.sheet.cell(row=self.aux_1, column=self.aux_2, value=caudal_aux)
 
    ## Actualiza el valor de las etiquetas de la pantalla  
    def ColocarValores(self):
@@ -174,6 +182,9 @@ class Grafica(Frame):
       self.tiempo_anterior_4_t.config(text=self.tiempo_anterior_fomateado[3])
       self.delta_4_t.config(text=self.delta_4)
       self.caudal_4_t.config(text=self.caudal[3])
+
+      # actualiza la informacion que sale por terminal
+      self.terminal_t.config(text=self.terminal)
 
    def HiloPrincipal(self):
 
@@ -237,22 +248,27 @@ class Grafica(Frame):
       hilo_principal.start() #Inicia el hilo principal
 
    def widgets(self):
+      color_fondo = '#cedee1'
+      color_boton = '#546981'
+      fondo_etiqueta = '#1a2d45'
+      color_letra = '#FBFBFB'
+
       ## define los frames en lo que se divide la interface grafica
-      frame = Frame(self.master, bg='#090818', bd=4)
+      frame = Frame(self.master, bg=color_fondo, bd=4)
       frame.grid(column=0, row=0, sticky='nsew')
-      frame0 = Frame(self.master, bg='#040208', bd=4)             
+      frame0 = Frame(self.master, bg=color_fondo, bd=4)             
       frame0.grid(column=1, row=0, sticky='nsew')
-      frame1 = Frame(self.master, bg='#091548', bd=4)
+      frame1 = Frame(self.master, bg=color_fondo, bd=4)
       frame1.grid(column=0, row=1, sticky='nsew')
-      frame2 = Frame(self.master, bg='#091708', bd=4)              
+      frame2 = Frame(self.master, bg=color_fondo, bd=4)              
       frame2.grid(column=1, row=1, sticky='nsew')
-      frame3 = Frame(self.master, bg='#093908', bd=4)             
+      frame3 = Frame(self.master, bg=color_fondo, bd=4)             
       frame3.grid(column=0, row=2, sticky='nsew')
-      frame4 = Frame(self.master, bg='#091408', bd=4)
+      frame4 = Frame(self.master, bg=color_fondo, bd=4)
       frame4.grid(column=1, row=2, sticky='nsew')
-      frame5 = Frame(self.master, bg='#090405', bd=4)
+      frame5 = Frame(self.master, bg=color_fondo, bd=4)
       frame5.grid(column=0, row=3, sticky='nsew')
-      frame6 = Frame(self.master, bg='#050401', bd=4)
+      frame6 = Frame(self.master, bg=color_fondo, bd=4)
       frame6.grid(column=1, row=3, sticky='nsew')
 
 
@@ -266,31 +282,29 @@ class Grafica(Frame):
       self.master.rowconfigure(3, weight=1)
 
       ## define etiquetas de referencia
-      Label(frame, text='Tomar valores', bg='#090808', fg='white', font=('Arial', 12, 'bold')).pack(padx=5, expand=1)
-      Label(frame1, text='Guardar Documento', bg='#090808', fg='white', font=('Arial', 12, 'bold')).pack(padx=5, expand=1)
-      Label(frame3, text='CONECTAR', bg='#090808', fg='white', font=('Arial', 12, 'bold')).pack(padx=5, expand=1)
-      Label(frame4, text='Puertos COM', bg='#090808', fg='white', font=('Arial', 12, 'bold')).pack(padx=5, expand=1)
-      Label(frame5, text='DESCONECTAR', bg='#090808', fg='white', font=('Arial', 12, 'bold')).pack(padx=5, expand=1)
-      Label(frame6, text='Baudrates', bg='#090808', fg='white', font=('Arial', 12, 'bold')).pack(padx=5, expand=1)
+      Label(frame3, text='CONECTAR', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).pack(padx=5, expand=1)
+      Label(frame5, text='DESCONECTAR', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).pack(padx=5, expand=1)
+
+      Label(frame, image=self.imagen).pack(padx=5, expand=1)
 
       ##############################################################################################################################
 
       ## define el cuadro para nombrar el documento del frame 2
-      Label(frame2, text='Nombre del Documento:', bg='#090808', fg='white', font=('Arial', 11, 'bold')).grid(row=3, column=0, padx=5, pady=5, sticky='nsew')
+      Label(frame2, text='Nombre del Documento:', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 11, 'bold')).grid(row=3, column=0, padx=5, pady=5, sticky='nsew')
       nombre_doc=Entry(frame2, textvariable=self.nombre_documento, font=('Arial', 12, 'bold'))
       nombre_doc.insert(0, "Documento_1") # valor por defecto 
       nombre_doc.grid(row=3, column=1, padx=5, pady=5, sticky='nsew')
 
       ## define el cuadro para ingresar las constante 1 del frame 2
-      Label(frame2, text='Constante 1', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=0, column=0, padx=5, pady=5, sticky='nsew')
+      Label(frame2, text='Constante 1', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).grid(row=0, column=0, padx=5, pady=5, sticky='nsew')
       self.constante_1_e=Entry(frame2, textvariable=self.factor_1, font=('Arial', 12, 'bold'))
-      self.constante_1_e.insert(0, "1") # valor por defecto 
+      self.constante_1_e.insert(0, "300") # valor por defecto 
       self.constante_1_e.grid(row=1, column=0, padx=5, pady=5, sticky='nsew')
 
       ## define el cuadro para ingresar las constante 2 del frame 2
-      Label(frame2, text='Constante 2', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=0, column=2, padx=5, pady=5, sticky='nsew')
+      Label(frame2, text='Constante 2', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).grid(row=0, column=2, padx=5, pady=5, sticky='nsew')
       self.constante_2_e=Entry(frame2, textvariable=self.factor_2, font=('Arial', 12, 'bold'))
-      self.constante_2_e.insert(0, "2") # valor por defecto 
+      self.constante_2_e.insert(0, "300") # valor por defecto 
       self.constante_2_e.grid(row=1, column=2, padx=5, pady=5, sticky='nsew')
 
       ## configuracion relativa del los tamaños dentro del frame 0
@@ -305,59 +319,59 @@ class Grafica(Frame):
       ##############################################################################################################################
 
       ## define una variable para mostrar el dato por pantalla del Frame 0
-      Label(frame0, text='Ciclo de trabajo %', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=1, column=0, padx=5, pady=5, sticky='nsew')
-      Label(frame0, text='Hora Actual', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=2, column=0, padx=5, pady=5, sticky='nsew')
-      Label(frame0, text='Hora Anterior', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=3, column=0, padx=5, pady=5, sticky='nsew')
-      Label(frame0, text='Tiempo diferencial [Seg]', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=4, column=0, padx=5, pady=5, sticky='nsew')
-      Label(frame0, text='Caudal [ ]', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=5, column=0, padx=5, pady=5, sticky='nsew')
+      Label(frame0, text='Ciclo de trabajo %', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).grid(row=1, column=0, padx=5, pady=5, sticky='nsew')
+      Label(frame0, text='Hora Actual', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).grid(row=2, column=0, padx=5, pady=5, sticky='nsew')
+      Label(frame0, text='Hora Anterior', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).grid(row=3, column=0, padx=5, pady=5, sticky='nsew')
+      Label(frame0, text='Tiempo diferencial [Seg]', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).grid(row=4, column=0, padx=5, pady=5, sticky='nsew')
+      Label(frame0, text='Caudal [ ]', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).grid(row=5, column=0, padx=5, pady=5, sticky='nsew')
 
 
-      Label(frame0, text='Sensor 1', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=0, column=1, padx=5, pady=5, sticky='nsew')
-      self.valor_actual_1_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      Label(frame0, text='Sensor 1', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).grid(row=0, column=1, padx=5, pady=5, sticky='nsew')
+      self.valor_actual_1_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.valor_actual_1_t.grid(row=1, column=1, padx=5, pady=5)
-      self.tiempo_1_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.tiempo_1_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.tiempo_1_t.grid(row=2, column=1, padx=5, pady=5)
-      self.tiempo_anterior_1_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.tiempo_anterior_1_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.tiempo_anterior_1_t.grid(row=3, column=1, padx=5, pady=5)
-      self.delta_1_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.delta_1_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.delta_1_t.grid(row=4, column=1, padx=5, pady=5)
-      self.caudal_1_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.caudal_1_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.caudal_1_t.grid(row=5, column=1, padx=5, pady=5)
 
-      Label(frame0, text='Sensor 2', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=0, column=2, padx=5, pady=5, sticky='nsew')
-      self.valor_actual_2_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      Label(frame0, text='Sensor 2', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).grid(row=0, column=2, padx=5, pady=5, sticky='nsew')
+      self.valor_actual_2_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.valor_actual_2_t.grid(row=1, column=2, padx=5, pady=5)
-      self.tiempo_2_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.tiempo_2_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.tiempo_2_t.grid(row=2, column=2, padx=5, pady=5)
-      self.tiempo_anterior_2_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.tiempo_anterior_2_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.tiempo_anterior_2_t.grid(row=3, column=2, padx=5, pady=5)
-      self.delta_2_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.delta_2_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.delta_2_t.grid(row=4, column=2, padx=5, pady=5)
-      self.caudal_2_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.caudal_2_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.caudal_2_t.grid(row=5, column=2, padx=5, pady=5)
 
-      Label(frame0, text='Sensor 3', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=0, column=3, padx=5, pady=5, sticky='nsew')
-      self.valor_actual_3_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      Label(frame0, text='Sensor 3', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).grid(row=0, column=3, padx=5, pady=5, sticky='nsew')
+      self.valor_actual_3_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.valor_actual_3_t.grid(row=1, column=3, padx=5, pady=5)
-      self.tiempo_3_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.tiempo_3_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.tiempo_3_t.grid(row=2, column=3, padx=5, pady=5)
-      self.tiempo_anterior_3_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.tiempo_anterior_3_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.tiempo_anterior_3_t.grid(row=3, column=3, padx=5, pady=5)
-      self.delta_3_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.delta_3_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.delta_3_t.grid(row=4, column=3, padx=5, pady=5)
-      self.caudal_3_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.caudal_3_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.caudal_3_t.grid(row=5, column=3, padx=5, pady=5)
 
-      Label(frame0, text='Sensor 4', bg='#090808', fg='white', font=('Arial', 12, 'bold')).grid(row=0, column=4, padx=5, pady=5, sticky='nsew')
-      self.valor_actual_4_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      Label(frame0, text='Sensor 4', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).grid(row=0, column=4, padx=5, pady=5, sticky='nsew')
+      self.valor_actual_4_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.valor_actual_4_t.grid(row=1, column=4, padx=5, pady=5)
-      self.tiempo_4_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.tiempo_4_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.tiempo_4_t.grid(row=2, column=4, padx=5, pady=5)
-      self.tiempo_anterior_4_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.tiempo_anterior_4_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.tiempo_anterior_4_t.grid(row=3, column=4, padx=5, pady=5)
-      self.delta_4_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.delta_4_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.delta_4_t.grid(row=4, column=4, padx=5, pady=5)
-      self.caudal_4_t = Label(frame0, text="none", font=('Arial', 12, 'bold'))
+      self.caudal_4_t = Label(frame0, text="none", font=('Arial', 12, 'bold'), bg=color_fondo)
       self.caudal_4_t.grid(row=5, column=4, padx=5, pady=5)
 
       ## configuracion relativa del los tamaños dentro del frame 0
@@ -374,54 +388,84 @@ class Grafica(Frame):
       frame0.rowconfigure(5, weight=1)
    
       ## define  botones
-      self.bt_iniciar = Button(frame, text='Iniciar', font=('Arial', 12, 'bold'),
-                              width=12, bg='#0cbccc', fg='black', command=self.funcion_a_realizar)
+      Label(frame1, text='Tomar valores', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).pack(padx=5, expand=1)
+      self.bt_iniciar = Button(frame1, text='Iniciar', font=('Arial', 12, 'bold'),
+                              width=12, bg=color_boton, fg=color_letra, command=self.iniciar)
       self.bt_iniciar.pack(pady=5, expand=1)
 
+      Label(frame1, text='Guardar Documento', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).pack(padx=5, expand=1)
       self.bt_guardar = Button(frame1, text='Guardar', font=('Arial', 12, 'bold'),
-                              width=12, bg='#2898ee', fg='black', command=self.guardar_datos)
+                              width=12, bg=color_boton, fg=color_letra, command=self.guardar_datos)
       self.bt_guardar.pack(pady=5, expand=1)
 
       self.bt_conectar = Button(frame3, text='Conectar', font=('Arial', 12, 'bold'),
-                              width=12, bg='#284eee', fg='black', command=self.conectar_serial)
+                              width=12, bg=color_boton, fg=color_letra, command=self.conectar_serial)
       self.bt_conectar.pack(pady=5, expand=1)
 
       self.bt_desconectar = Button(frame5, state='disabled', text='Desconectar', font=('Arial', 12, 'bold'),
-                              width=12, bg='#284eee', fg='black', command=self.desconectar_serial)
+                              width=12, bg=color_boton, fg=color_letra, command=self.desconectar_serial)
       self.bt_desconectar.pack(pady=5, expand=1)
 
-      ## extrae informacion de puertos y velocidades
+###########################################################################################################################
+
+      ## extrae informacion de puertos y velocidades del frame 4
+      Label(frame4, text='Puertos COM', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).grid(row=0, column=0, padx=5, pady=5, sticky='nsew')
+      Label(frame4, text='Baudrates', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).grid(row=0, column=1, padx=5, pady=5, sticky='nsew')
+
       baud = self.datos_placa.baudrates
 
-      self.combobox_baud = ttk.Combobox(frame6, values=baud, justify='center', width=12, font='Arial')
-      self.combobox_baud.pack(padx=20, expand=1)
+      self.combobox_baud = ttk.Combobox(frame4, values=baud, justify='center', width=12, font='Arial')
+      self.combobox_baud.grid(row=1, column=1, padx=5, pady=5, sticky='nsew')
       self.combobox_baud.current(3)
       try:
          port = self.datos_placa.puertos
 
          self.combobox_port = ttk.Combobox(frame4, values=port, justify='center', width=12, font='Arial')
-         self.combobox_port.pack(pady=0, expand=1)
+         self.combobox_port.grid(row=1, column=0, padx=5, pady=5, sticky='nsew')
          self.combobox_port.current(0)
       except:
          pass
+
+      frame4.columnconfigure(0,weight=1)
+      frame4.columnconfigure(1,weight=1)
+      frame4.rowconfigure(0, weight=1)
+      frame4.rowconfigure(1, weight=1)
+
+      Label(frame6, text='Terminal', bg=fondo_etiqueta, fg=color_letra, font=('Arial', 12, 'bold')).grid(row=0, column=0, padx=5, pady=5, sticky='nsew')
+      self.terminal_t=Label(frame6, bg='black', fg='white', font=('Arial', 12, 'bold'))
+      self.terminal_t.grid(row=1, column=0, padx=5, pady=5, sticky='nsew')
+
+      frame6.columnconfigure(0,weight=1)
+      frame6.rowconfigure(0, weight=1)
+      frame6.rowconfigure(1, weight=2)
 
       ## Crea un hilo para majar la parte logica del almacenamiento de los datos
       self.CrearHilo()
 
       
-   def funcion_a_realizar(self):
+   def iniciar(self):
 
-      print("hola")
-      
-      segundos = float(self.delta_aux.total_seconds())
-      print(type(segundos))
-      print(segundos)
+      if (self.datos_placa.placa.is_open):
 
+         if self.flag[0] == 0 :
+            self.flag[0] = 1
+            self.bt_iniciar.config(text="Finalizar")
+            self.terminal="Inicia la captura de los datos"
+            print("Tomando datos")
+         elif self.flag[0] == 1:
+            self.flag[0] = 0
+            self.bt_iniciar.config(text="Iniciar")
+            self.terminal="Finaliza la captura de datos"
+            print("Finaliza la toma de datos")
 
    def guardar_datos(self):
 
       self.sheet.title = self.nombre_documento.get() # Cambiar el nombre de la hoja de cálculo
       self.libro.save(filename= self.sheet.title+'.xlsx')# Guardar el libro de trabajo en un archivo
+
+      # actualiza la informacion que sale por terminal
+      self.terminal="Documento Guardado"
+      self.terminal_t.config(text=self.terminal)
 
    def conectar_serial(self):
 
@@ -440,27 +484,34 @@ class Grafica(Frame):
          self.factor[1] = float(self.factor_2.get())
          self.constante_2_e.config(state='disabled')
 
+         # actualiza la informacion que sale por terminal
+         self.terminal="Conectado"
+         self.terminal_t.config(text=self.terminal)
+
    def desconectar_serial(self):
-      self.bt_conectar.config(state='normal')
-      self.bt_desconectar.config(state='disabled')
+
       try:
          self.ani.event_source.stop()
       except AttributeError:
          pass
       self.datos_placa.desconectar()
 
-      # Desbloquea las constantes
-      self.constante_1_e.config(state='normal')
-      self.constante_2_e.config(state='normal')
+      if (not self.datos_placa.placa.is_open):
+         # Desbloquea las constantes
+         self.constante_1_e.config(state='normal')
+         self.constante_2_e.config(state='normal')
+         self.bt_conectar.config(state='normal')
+         self.bt_desconectar.config(state='disabled')
+         self.terminal="Desconectado"
+         self.terminal_t.config(text=self.terminal)
 
 ## Inicia el bucle principal
 if __name__ == "__main__":
-   #archivo_texto = open('datos_uart.txt', 'w')
    terminal = Tk()
    terminal.geometry('742x535')
    terminal.config(bg='#010808', bd=4)
    terminal.wm_title('Caudalimetro')
    terminal.minsize(width=700, height=400)  # Corregido el nombre de 'minisize' a 'minsize'
-   #ventana.call('wm', 'iconphoto', ventana._w, PhotoImage(file='logo.png'))
+   terminal.call('wm', 'iconphoto', terminal._w, PhotoImage(file='img1.png'))
    app = Grafica(terminal)
    app.mainloop()
